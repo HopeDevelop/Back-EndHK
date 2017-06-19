@@ -15,7 +15,7 @@ CREATE TABLE receptors (
 	cnpj VARCHAR(20) NOT NULL UNIQUE,
 	address VARCHAR(100) NOT NULL,
 	email VARCHAR(100),
-	site VARCHAR(200)
+	site VARCHAR(2000)
 );
 
 CREATE TABLE phone_numbers (
@@ -56,3 +56,33 @@ FOR EACH ROW BEGIN
 END;\\
 
 DELIMITER ;
+
+CREATE TABLE flags (
+	name VARCHAR(30) PRIMARY KEY
+);
+
+INSERT INTO flags VALUES
+('Alimento'),
+('Roupa'),
+('Medicamento'),
+('Em espécie'),
+('Animais'),
+('Crianças'),
+('Idosos'),
+('Hospitais'),
+('Vacinação'),
+('Dependência Química'),
+('Sem-teto'),
+('Serviços'),
+('Desastres'),
+('Imigração'),
+('Violência doméstica');
+
+CREATE TABLE donations (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	cnpj VARCHAR(20) NOT NULL,
+	CONSTRAINT donations_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	title VARCHAR(50) NOT NULL,
+	description TEXT NOT NULL,
+	link VARCHAR(2000)
+);
