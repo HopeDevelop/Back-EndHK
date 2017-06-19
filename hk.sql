@@ -1,6 +1,32 @@
+CREATE TABLE flags (
+	name VARCHAR(30) PRIMARY KEY
+);
+
+INSERT INTO flags VALUES
+('Alimento'),
+('Roupa'),
+('Medicamento'),
+('Em espécie'),
+('Animais'),
+('Crianças'),
+('Idosos'),
+('Hospitais'),
+('Vacinação'),
+('Dependência Química'),
+('Sem-teto'),
+('Serviços'),
+('Desastres'),
+('Imigração'),
+('Violência doméstica');
+
 CREATE TABLE users (
 	username VARCHAR(20) PRIMARY KEY,
 	password VARCHAR(32) NOT NULL
+);
+
+CREATE TABLE admins (
+	username VARCHAR(20) PRIMARY KEY,
+	CONSTRAINT admins_username_fk FOREIGN KEY (username) REFERENCES users(username)
 );
 
 CREATE TABLE donators (
@@ -12,10 +38,54 @@ CREATE TABLE donators (
 CREATE TABLE receptors (
 	username VARCHAR(20) PRIMARY KEY,
 	CONSTRAINT receptors_username_fk FOREIGN KEY (username) REFERENCES users(username),
+	name VARCHAR(100) NOT NULL,
 	cnpj VARCHAR(20) NOT NULL UNIQUE,
 	address VARCHAR(100) NOT NULL,
 	email VARCHAR(100),
 	site VARCHAR(2000)
+);
+
+CREATE TABLE receptor_flags (
+	cnpj VARCHAR(20) NOT NULL,
+	CONSTRAINT receptor_flags_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	flag VARCHAR(30) NOT NULL,
+	CONSTRAINT receptor_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	PRIMARY KEY (cnpj, flag)
+);
+
+CREATE TABLE donations (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	cnpj VARCHAR(20) NOT NULL,
+	CONSTRAINT donations_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	title VARCHAR(50) NOT NULL,
+	description TEXT NOT NULL,
+	link VARCHAR(2000)
+);
+
+CREATE TABLE donation_flags (
+	id INT NOT NULL,
+	CONSTRAINT donation_flags_id_fk FOREIGN KEY (id) REFERENCES donations(id),
+	flag VARCHAR(30) NOT NULL,
+	CONSTRAINT donation_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	PRIMARY KEY (id, flag)
+);
+
+CREATE TABLE events (
+	id INTEGER AUTO_INCREMENT PRIMARY KEY,
+	cnpj VARCHAR(20) NOT NULL,
+	CONSTRAINT events_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	location VARCHAR(50) NOT NULL,
+	address VARCHAR(100) NOT NULL,
+	edate DATE NOT NULL,
+	etime TIME NOT NULL
+);
+
+CREATE TABLE event_flags (
+	id INT NOT NULL,
+	CONSTRAINT event_flags_id_fk FOREIGN KEY (id) REFERENCES events(id),
+	flag VARCHAR(30) NOT NULL,
+	CONSTRAINT event_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	PRIMARY KEY (id, flag)
 );
 
 CREATE TABLE phone_numbers (
@@ -56,33 +126,3 @@ FOR EACH ROW BEGIN
 END;\\
 
 DELIMITER ;
-
-CREATE TABLE flags (
-	name VARCHAR(30) PRIMARY KEY
-);
-
-INSERT INTO flags VALUES
-('Alimento'),
-('Roupa'),
-('Medicamento'),
-('Em espécie'),
-('Animais'),
-('Crianças'),
-('Idosos'),
-('Hospitais'),
-('Vacinação'),
-('Dependência Química'),
-('Sem-teto'),
-('Serviços'),
-('Desastres'),
-('Imigração'),
-('Violência doméstica');
-
-CREATE TABLE donations (
-	id INTEGER AUTO_INCREMENT PRIMARY KEY,
-	cnpj VARCHAR(20) NOT NULL,
-	CONSTRAINT donations_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
-	title VARCHAR(50) NOT NULL,
-	description TEXT NOT NULL,
-	link VARCHAR(2000)
-);
