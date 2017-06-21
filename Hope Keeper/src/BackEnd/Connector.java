@@ -8,56 +8,63 @@ import java.sql.ResultSet;
 
 public class Connector {
 	private Connection connection;
+	private Statement stmt;
 	
 	protected Connector() {
 		connection = null;
+		stmt = null;
 	}
 
-	private boolean connect() {
-		try {
-			connection = DriverManager.getConnection("jdbc:mysql://ip:port/db", "username", "password");
-		} catch (SQLException ex) {
-			connection = null;
-			return false;
+	protected boolean connect() {
+		if (connection == null) {
+			try {
+				connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/teste", "teste", "");
+				stmt = connection.createStatement();
+			} catch (SQLException ex) {
+				connection = null;
+				stmt = null;
+				System.out.println("Connector.connect() error: " + ex.getMessage());
+
+				return false;
+			}
 		}
+
 		return true;
 	}
 	
-	protected ResultSet query(String query) {
-		Statement stmt = null;
+	protected ResultSet query(String sql) {
 		ResultSet rs = null;
 		
 		try {
-			this.connect();
-			stmt = connection.createStatement();
+			if (!this.connect()) {
+				return null;
+			}
 			
-			if (stmt.execute(query)) {
+			if (stmt.execute(sql)) {
 				rs = stmt.getResultSet();
 			}
 		} catch (SQLException ex) {
-			System.out.println("Erro: " + ex.getMessage());
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException ex) {
-					// IGNORE
-				}
-				stmt = null;
-			}
-			
-			this.disconnect();
+			System.out.println("Connector.query() error: " + ex.getMessage());
 		}
 		
 		return rs;
 	}
 	
-	private void disconnect() {
+	protected void close() {
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (SQLException ex) {
+				System.out.println("Connector.close() error: " + ex.getMessage());
+			}
+			
+			connection = null;
+		}
 		if (connection != null) {
 			try {
 				connection.close();
 			} catch (SQLException ex) {
-				// IGNORE
+				System.out.println("Connector.close() error: " + ex.getMessage());
 			}
 			
 			connection = null;
