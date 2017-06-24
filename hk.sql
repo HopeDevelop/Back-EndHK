@@ -42,7 +42,8 @@ CREATE TABLE receptors (
 	cnpj VARCHAR(20) NOT NULL UNIQUE,
 	address VARCHAR(100) NOT NULL,
 	email VARCHAR(100),
-	site VARCHAR(2000)
+	site VARCHAR(2000),
+	description TEXT
 );
 
 CREATE TABLE receptor_flags (
@@ -74,8 +75,12 @@ CREATE TABLE events (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	cnpj VARCHAR(20) NOT NULL,
 	CONSTRAINT events_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	title VARCHAR(50),
+	description TEXT,
 	location VARCHAR(50) NOT NULL,
 	address VARCHAR(100) NOT NULL,
+	bdate DATE NOT NULL,
+	btime TIME NOT NULL,
 	edate DATE NOT NULL,
 	etime TIME NOT NULL
 );
