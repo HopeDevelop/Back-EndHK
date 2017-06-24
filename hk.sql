@@ -110,7 +110,7 @@ CREATE TABLE favorites (
 
 CREATE TABLE receptor_requests (
 	username VARCHAR(20) PRIMARY KEY,
-	CONSTRAINT receptors_username_fk FOREIGN KEY (username) REFERENCES users(username),
+	CONSTRAINT receptors_requests_username_fk FOREIGN KEY (username) REFERENCES users(username),
 	name VARCHAR(100) NOT NULL,
 	cnpj VARCHAR(20) NOT NULL UNIQUE,
 	address VARCHAR(100) NOT NULL,
@@ -120,16 +120,16 @@ CREATE TABLE receptor_requests (
 
 CREATE TABLE receptor_requests_flags (
 	cnpj VARCHAR(20) NOT NULL,
-	CONSTRAINT receptor_flags_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	CONSTRAINT receptor_requests_flags_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
 	flag VARCHAR(30) NOT NULL,
-	CONSTRAINT receptor_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	CONSTRAINT receptor_requests_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
 	PRIMARY KEY (cnpj, flag)
 );
 
 CREATE TABLE donation_requests (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	cnpj VARCHAR(20) NOT NULL,
-	CONSTRAINT donations_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	CONSTRAINT donations_requests_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
 	title VARCHAR(50) NOT NULL,
 	description TEXT NOT NULL,
 	link VARCHAR(2000)
@@ -137,16 +137,16 @@ CREATE TABLE donation_requests (
 
 CREATE TABLE donation_requests_flags (
 	id INT NOT NULL,
-	CONSTRAINT donation_flags_id_fk FOREIGN KEY (id) REFERENCES donations(id),
+	CONSTRAINT donation_requests_flags_id_fk FOREIGN KEY (id) REFERENCES donations(id),
 	flag VARCHAR(30) NOT NULL,
-	CONSTRAINT donation_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	CONSTRAINT donation_requests_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
 	PRIMARY KEY (id, flag)
 );
 
 CREATE TABLE event_requests (
 	id INTEGER AUTO_INCREMENT PRIMARY KEY,
 	cnpj VARCHAR(20) NOT NULL,
-	CONSTRAINT events_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
+	CONSTRAINT events_requests_cnpj_fk FOREIGN KEY (cnpj) REFERENCES receptors(cnpj),
 	location VARCHAR(50) NOT NULL,
 	address VARCHAR(100) NOT NULL,
 	edate DATE NOT NULL,
@@ -155,9 +155,9 @@ CREATE TABLE event_requests (
 
 CREATE TABLE event_requests_flags (
 	id INT NOT NULL,
-	CONSTRAINT event_flags_id_fk FOREIGN KEY (id) REFERENCES events(id),
+	CONSTRAINT event_requests_flags_id_fk FOREIGN KEY (id) REFERENCES events(id),
 	flag VARCHAR(30) NOT NULL,
-	CONSTRAINT event_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
+	CONSTRAINT event_requests_flags_flag_fk FOREIGN KEY (flag) REFERENCES flags(name),
 	PRIMARY KEY (id, flag)
 );
 
@@ -166,14 +166,18 @@ DELIMITER \\
 -- PARAMS:
 -- donator : USERNAME DO USUÁRIO DOADOR
 -- receptor : CNPJ DO USUÁRIO RECEPTOR
-CREATE PROCEDURE insert_favorite (donator VARCHAR(20), receptor VARCHAR(20)) BEGIN
+CREATE FUNCTION insert_favorite (donator VARCHAR(20), receptor VARCHAR(20))
+RETURNS TINYINT BEGIN
 	SELECT donators.favorites INTO @amount FROM donators WHERE donators.username = donator;
 
 	IF @amount < 10 THEN
 		SET @amount = @amount + 1;
 		INSERT INTO favorites VALUES (username, receptor);
 		UPDATE donators SET donators.favorites = @amount WHERE donators.username = donator;
+		RETURN 1;
 	END IF;
+
+	RETURN 0;
 END;\\
 
 CREATE TRIGGER delete_favorite AFTER DELETE ON favorites
