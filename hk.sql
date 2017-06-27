@@ -163,6 +163,22 @@ CREATE TABLE event_requests_flags (
 
 DELIMITER \\
 
+CREATE PROCEDURE new_donator (un VARCHAR(20), pw VARCHAR(32))
+BEGIN
+	INSERT INTO users(username, password) VALUES (un, pw);
+	INSERT INTO donators(username) VALUES (un);
+END;\\
+
+CREATE PROCEDURE new_receptor (
+	un VARCHAR(20), pw VARCHAR(32), pname VARCHAR(100), pcnpj VARCHAR(20),
+	paddress VARCHAR(100), pemail VARCHAR(100), psite VARCHAR(2000), pdescription TEXT
+) BEGIN
+	INSERT INTO users(username, password) VALUES (un, pw);
+	
+	INSERT INTO donators(username, name, cnpj, address, email, site, description)
+	VALUES (un, pname, pcnpj, paddress, pemail, psite, pdescription);
+END;\\
+
 -- PARAMS:
 -- donator : USERNAME DO USUÁRIO DOADOR
 -- receptor : CNPJ DO USUÁRIO RECEPTOR
