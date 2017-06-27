@@ -161,13 +161,13 @@ CREATE TABLE event_requests_flags (
 	PRIMARY KEY (id, flag)
 );
 
-DELIMITER \\
+DELIMITER //
 
 CREATE PROCEDURE new_donator (un VARCHAR(20), pw VARCHAR(32))
 BEGIN
 	INSERT INTO users(username, password) VALUES (un, pw);
 	INSERT INTO donators(username) VALUES (un);
-END;\\
+END;//
 
 CREATE PROCEDURE new_receptor (
 	un VARCHAR(20), pw VARCHAR(32), pname VARCHAR(100), pcnpj VARCHAR(20),
@@ -177,7 +177,7 @@ CREATE PROCEDURE new_receptor (
 	
 	INSERT INTO donators(username, name, cnpj, address, email, site, description)
 	VALUES (un, pname, pcnpj, paddress, pemail, psite, pdescription);
-END;\\
+END;//
 
 -- PARAMS:
 -- donator : USERNAME DO USUÁRIO DOADOR
@@ -194,13 +194,13 @@ RETURNS TINYINT BEGIN
 	END IF;
 
 	RETURN 0;
-END;\\
+END;//
 
 CREATE TRIGGER delete_favorite AFTER DELETE ON favorites
 FOR EACH ROW BEGIN
 	SELECT donators.favorites INTO @amount FROM donators WHERE donators.username = OLD.donator;
 	SET @amount = @amount - 1;
 	UPDATE donators SET donators.favorites = @amount WHERE donators.username = OLD.donator;
-END;\\
+END;//
 
 DELIMITER ;
