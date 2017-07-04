@@ -42,7 +42,7 @@ app.post('/home', (req, res) => {
 });
 
 app.get('/receptores', (req, res) => {
-	fs.readFile('./static/receptores.ejs', 'utf8', (err, data) => {
+	fs.readFile('./static/receptores.html', 'utf8', (err, data) => {
 		var db = require('./connection');
 
 		db.query("SELECT * FROM receptor_requests", [], (err, result) => {
