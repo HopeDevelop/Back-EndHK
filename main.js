@@ -53,7 +53,7 @@ app.get('/receptores', (req, res) => {
 					for (key in item) {
 						main += "<p>"+key+": "+item[key]+"</p>";
 					}
-					main += "<input type='hidden' name'username' value='"+item.username+"' />";
+					main += "<input type='hidden' name='username' value='"+item.username+"' />";
 					main += "<input type='submit' formaction='/saveReceptor' value='Salvar' />";
 					main += "<input type='submit' formaction='/rejectReceptor' value='Recusar' />";
 					main += "</form>";
@@ -70,13 +70,13 @@ app.get('/receptores', (req, res) => {
 
 app.post('/saveReceptor', (req, res) => {
 	req.on('data', (data) => {
-		console.log(data.toString());
 		var db = require('./connection');
-		console.log(data.toString().split("=")[1]);
+		data = data.toString().split("=")[1];
+		data = data.replace(/\s/g, '');
 
 		db.query(
-			'SELECT accept_receptor_request($1::VARCHAR(20))',
-			[data.split("=")[1]], (err, result) => {
+			'SELECT accept_receptor_request($1::VARCHAR)', [data],
+			(err, result) => {
 				if (err) console.log(err);
 
 				res.redirect('/receptores');
@@ -89,13 +89,15 @@ app.post('/saveReceptor', (req, res) => {
 app.post('/rejectReceptor', (req, res) => {
 	req.on('data', (data) => {
 		var db = require('./connection');
-		db.query(
-			'SELECT remove_receptor_request($1::VARCHAR(20)',
-			[data.toString().split("=")[1]],
-			(err, results) => {
-				if (err) throw err
+		data = data.toString().split("=")[1];
+		data = data.replace(/\s/g, '');
 
-				res.redirect('/receptores')
+		db.query(
+			'SELECT remove_receptor_request($1::VARCHAR)', [data],
+			(err, results) => {
+				if (err) console.log(err);
+
+				res.redirect('/receptores');
 				res.end();
 			}
 		);
